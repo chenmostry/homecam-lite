@@ -1,0 +1,20 @@
+{
+  "name": "旧机看家 · HomeCam Lite",
+  "short_name": "旧机看家",
+  "description": "让旧手机以前台摄像端接入你的家庭实时查看服务。",
+  "lang": "zh-CN",
+  "start_url": "/#/viewer",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f2f7f6",
+  "theme_color": "#09232b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

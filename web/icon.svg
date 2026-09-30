@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="旧机看家">
+  <defs>
+    <linearGradient id="g" x1="12" y1="9" x2="85" y2="91" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20a99a"/>
+      <stop offset="1" stop-color="#075f63"/>
+    </linearGradient>
+    <linearGradient id="lens" x1="32" y1="31" x2="66" y2="66" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d8fff1"/>
+      <stop offset="1" stop-color="#64d8bc"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="86" height="86" rx="27" fill="#09232b"/>
+  <rect x="11" y="11" width="74" height="74" rx="23" fill="url(#g)"/>
+  <path d="M31 29h34a9 9 0 0 1 9 9v21a9 9 0 0 1-9 9H31a9 9 0 0 1-9-9V38a9 9 0 0 1 9-9Z" fill="#0b343b" stroke="#d7faf0" stroke-width="3.5"/>
+  <circle cx="48" cy="49" r="12" fill="#0c6767" stroke="url(#lens)" stroke-width="4"/>
+  <circle cx="48" cy="49" r="4" fill="#bffff0"/>
+  <path d="M34 21h28" stroke="#b7f3e4" stroke-linecap="round" stroke-width="3" opacity=".8"/>
+  <circle cx="65" cy="37" r="2.3" fill="#7ff0c6"/>
+</svg>

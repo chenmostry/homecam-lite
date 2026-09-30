@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#09232b">
+  <meta name="description" content="旧手机变成一台只在你需要时开启的家庭摄像头。">
+  <title>旧机看家 · HomeCam Lite</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <header class="app-header">
+    <a class="brand" href="#/viewer" aria-label="旧机看家首页">
+      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <span class="brand-copy"><strong>旧机看家</strong><small>HomeCam Lite</small></span>
+    </a>
+    <nav class="role-switch" aria-label="选择使用方式">
+      <a href="#/viewer" class="role-link is-active" data-route="viewer" aria-current="page">查看端</a>
+      <a href="#/camera" class="role-link" data-route="camera">摄像试用</a>
+    </nav>
+    <span class="header-status"><span class="status-dot" id="network-dot"></span><span id="network-label">正在检查</span></span>
+  </header>
+
+  <main id="main-content" class="page-wrap">
+    <section class="page" id="viewer-page" aria-labelledby="viewer-heading">
+      <div class="intro-row">
+        <div>
+          <p class="eyebrow">私有连接 · 不保存录像</p>
+          <h1 id="viewer-heading">查看家中画面</h1>
+          <p class="intro-copy">用一台旧手机看住你在意的地方。画面只在连接期间实时传输，快照保存在当前设备。</p>
+        </div>
+        <div class="privacy-note"><span class="privacy-icon" aria-hidden="true">◉</span><span>由你的服务器<br>安全转发</span></div>
+      </div>
+
+      <section class="panel login-panel" id="viewer-login" aria-labelledby="login-heading">
+        <div class="panel-heading">
+          <div class="step-number">01</div>
+          <div><p class="eyebrow">管理员验证</p><h2 id="login-heading">登录查看端</h2></div>
+        </div>
+        <p class="muted">使用部署时设置的管理员口令。登录状态由安全 Cookie 维护，不会保存在网页本地。</p>
+        <form id="login-form" class="form-row">
+          <label class="field grow" for="login-password"><span>管理员口令</span><input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
+          <button class="button button-primary align-end" type="submit">登录</button>
+        </form>
+        <p class="form-message" id="login-message" aria-live="polite"></p>
+      </section>
+
+      <div id="viewer-dashboard" hidden>
+        <div class="dashboard-toolbar">
+          <div class="signed-in"><span class="status-dot status-dot-good"></span><span>管理员已登录</span></div>
+          <button class="button button-quiet button-small" id="logout-button" type="button">退出登录</button>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel device-panel" aria-labelledby="devices-heading">
+            <div class="panel-title-row">
+              <div><p class="eyebrow">你的设备</p><h2 id="devices-heading">摄像头</h2></div>
+              <button class="icon-button" id="refresh-devices" type="button" aria-label="刷新摄像头列表" title="刷新">↻</button>
+            </div>
+            <p class="muted panel-description">完成配对的旧手机会出现在这里。选择在线设备开始查看。</p>
+            <ul class="device-list" id="devices-list" aria-live="polite">
+              <li class="empty-row"><span class="empty-symbol" aria-hidden="true">⌁</span><span>正在读取设备列表…</span></li>
+            </ul>
+            <p class="form-message" id="devices-message" aria-live="polite"></p>
+          </section>
+
+          <section class="panel pairing-panel" aria-labelledby="pairing-heading">
+            <div class="panel-heading compact-heading">
+              <div class="step-number">02</div>
+              <div><p class="eyebrow">添加旧手机</p><h2 id="pairing-heading">创建配对码</h2></div>
+            </div>
+            <p class="muted">配对码仅能使用一次，10 分钟后过期。请在摄像端手动输入。</p>
+            <form id="pairing-form" class="stack-form">
+              <label class="field" for="pairing-name"><span>设备名称</span><input id="pairing-name" name="name" type="text" maxlength="48" placeholder="例如：客厅旧手机" required></label>
+              <button class="button button-primary" type="submit">生成一次性配对码</button>
+            </form>
+            <div class="pairing-result" id="pairing-result" hidden>
+              <span class="result-label">请在摄像端输入此代码</span>
+              <div class="pair-code-row"><strong class="pair-code" id="pairing-code"></strong><button class="button button-quiet button-small" id="copy-code" type="button">复制</button></div>
+              <span class="result-expiry" id="pairing-expiry"></span>
+            </div>
+            <p class="form-message" id="pairing-message" aria-live="polite"></p>
+          </section>
+
+          <section class="panel live-panel" aria-labelledby="live-heading">
+            <div class="panel-title-row live-title-row">
+              <div><p class="eyebrow">实时画面</p><h2 id="live-heading">查看现场</h2></div>
+              <span class="live-badge" id="viewer-live-badge"><span class="status-dot"></span>未连接</span>
+            </div>
+            <div class="video-shell viewer-video-shell">
+              <video id="viewer-video" autoplay playsinline muted aria-label="摄像头实时画面"></video>
+              <div class="video-placeholder" id="viewer-placeholder">
+                <span class="camera-glyph" aria-hidden="true">▣</span>
+                <strong>选择一台摄像头</strong>
+                <span>实时画面会显示在这里</span>
+              </div>
+              <span class="video-live-tag" id="video-live-tag" hidden><i></i>LIVE</span>
+            </div>
+            <div class="live-controls">
+              <button class="button button-secondary" id="sound-button" type="button" disabled>开启声音</button>
+              <button class="button button-secondary" id="snapshot-button" type="button" disabled>保存快照</button>
+              <button class="button button-quiet" id="unwatch-button" type="button" disabled>断开查看</button>
+            </div>
+            <div class="connection-details" aria-live="polite">
+              <span><small>链路</small><strong id="link-status">等待连接</strong></span>
+              <span><small>接收速率</small><strong id="receive-rate">—</strong></span>
+              <span><small>往返延迟</small><strong id="round-trip">—</strong></span>
+              <span><small>解码画面</small><strong id="decoded-fps">—</strong></span>
+              <span><small>ICE 候选路径</small><strong id="ice-path">—</strong></span>
+            </div>
+            <p class="form-message" id="watch-message" aria-live="polite"></p>
+            <p class="privacy-footnote">快照由浏览器在本机生成并下载，服务端不接收或保存。</p>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="camera-page" aria-labelledby="camera-heading" hidden>
+      <div class="intro-row camera-intro">
+        <div>
+          <p class="eyebrow">浏览器摄像端 · 前台试用 / 备用</p>
+          <h1 id="camera-heading">摄像端</h1>
+          <p class="intro-copy">Android 原生摄像端适合长期使用；此网页摄像端用于前台试用和备用。开始前由你授权摄像头和可选麦克风。</p>
+        </div>
+        <div class="camera-pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+
+      <section class="panel enroll-panel" id="camera-enroll" aria-labelledby="enroll-heading">
+        <div class="panel-heading">
+          <div class="step-number">01</div>
+          <div><p class="eyebrow">一次性设置</p><h2 id="enroll-heading">绑定这台手机</h2></div>
+        </div>
+        <p class="muted">先在查看端创建配对码，再把 8 位代码输入这里。设备令牌只保存在这台手机。</p>
+        <form id="enroll-form" class="form-row">
+          <label class="field grow" for="enroll-code"><span>一次性配对码</span><input id="enroll-code" name="code" type="text" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" maxlength="8" pattern="[A-Za-z0-9]{8}" placeholder="AB12CD34" required></label>
+          <button class="button button-primary align-end" type="submit">绑定设备</button>
+        </form>
+        <p class="form-message" id="enroll-message" aria-live="polite"></p>
+      </section>
+
+      <div id="camera-console" hidden>
+        <div class="camera-state-banner" id="camera-state-banner" role="status">
+          <span class="status-dot"></span><span id="camera-state-text">已绑定，摄像头尚未启动</span>
+        </div>
+        <div class="camera-layout">
+          <section class="panel camera-preview-panel" aria-labelledby="preview-heading">
+            <div class="panel-title-row">
+              <div><p class="eyebrow">本机预览</p><h2 id="preview-heading">摄像头画面</h2></div>
+              <span class="capture-indicator" id="capture-indicator" hidden><i></i>正在采集</span>
+            </div>
+            <div class="video-shell camera-video-shell" id="camera-video-shell">
+              <video id="camera-video" autoplay playsinline muted aria-label="本机摄像头预览"></video>
+              <div class="video-placeholder" id="camera-placeholder">
+                <span class="camera-glyph" aria-hidden="true">▣</span>
+                <strong>摄像头未启动</strong>
+                <span>点击下方按钮并允许浏览器访问</span>
+              </div>
+              <span class="video-live-tag camera-video-tag" id="camera-live-tag" hidden><i></i>本机采集中</span>
+            </div>
+            <div class="camera-active-caption" id="camera-active-caption" hidden>
+              <span class="capture-dot"></span><span>摄像头正在工作，远端连接状态会显示在上方。</span>
+            </div>
+            <div class="camera-diagnostics" aria-live="polite">
+              <span><small>观看连接</small><strong id="camera-peer-status">未连接</strong></span>
+              <span><small>ICE 候选路径</small><strong id="camera-ice-path">—</strong></span>
+              <span><small>发送速率</small><strong id="camera-send-rate">—</strong></span>
+              <span><small>编码画面</small><strong id="camera-fps">—</strong></span>
+              <span><small>往返延迟</small><strong id="camera-rtt">—</strong></span>
+            </div>
+            <div class="visibility-warning" id="visibility-warning" hidden>
+              <strong>页面已切到后台</strong><span>浏览器可能暂停摄像头。为了持续查看，请让此页面保持打开并保持屏幕唤醒。</span>
+            </div>
+            <div class="camera-privacy-note"><span aria-hidden="true">◆</span><span>摄像头由你手动启动。点击停止后会关闭摄像头、麦克风和所有连接。</span></div>
+          </section>
+
+          <section class="panel camera-controls-panel" aria-labelledby="settings-heading">
+            <div class="panel-title-row">
+              <div><p class="eyebrow">采集设置</p><h2 id="settings-heading">设备选项</h2></div>
+            </div>
+            <div class="camera-settings">
+              <label class="field" for="camera-facing"><span>摄像头方向</span>
+                <select id="camera-facing" name="facing">
+                  <option value="environment">后置摄像头</option>
+                  <option value="user">前置摄像头</option>
+                </select>
+              </label>
+              <label class="field" for="camera-resolution"><span>画面清晰度</span>
+                <select id="camera-resolution" name="resolution">
+                  <option value="480">480p · 省流量</option>
+                  <option value="720">720p · 更清晰</option>
+                </select>
+              </label>
+              <label class="toggle-row" for="camera-microphone">
+                <span class="toggle-copy"><strong>传送环境声音</strong><small>默认关闭 · 仅在你开启后采集</small></span>
+                <input id="camera-microphone" type="checkbox">
+                <span class="toggle-ui" aria-hidden="true"></span>
+              </label>
+            </div>
+            <div class="camera-actions">
+              <button class="button button-primary button-wide" id="camera-start" type="button">开始采集</button>
+              <button class="button button-danger button-wide" id="camera-stop" type="button" hidden>停止并断开</button>
+            </div>
+            <div class="utility-controls">
+              <button class="button button-secondary" id="wake-lock-button" type="button" aria-pressed="false">保持屏幕唤醒：关</button>
+              <button class="button button-secondary" id="dim-button" type="button" aria-pressed="false">调暗画面</button>
+            </div>
+            <p class="muted tiny-copy">调暗仅覆盖网页显示区域，不会关闭屏幕。系统仍可能因省电策略关闭浏览器。</p>
+            <p class="form-message" id="camera-message" aria-live="polite"></p>
+          </section>
+        </div>
+        <div class="camera-footer-row">
+          <span id="camera-device-name"></span>
+          <button class="text-button" id="forget-device" type="button">在此手机移除此绑定</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span>HomeCam Lite · 旧机看家</span><span>前台运行 · 不提供云端录像</span></footer>
+  <div class="dim-overlay" id="dim-overlay" hidden>
+    <div class="dim-card"><span class="dim-indicator"><i></i>采集仍在运行</span><p>画面已调暗</p><button class="button button-secondary" id="restore-screen" type="button">轻触恢复画面</button></div>
+  </div>
+  <canvas id="snapshot-canvas" hidden></canvas>
+</body>
+</html>
